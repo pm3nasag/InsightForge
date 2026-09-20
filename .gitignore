@@ -1,0 +1,19 @@
+# --- environment ---
+venv/
+.env
+
+# --- python ---
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- generated artefacts (rebuilt by run_pipeline.py) ---
+outputs/
+
+# --- course download bundles (redundant with the extracted folders) ---
+*.zip
+Helper_Guide/
+
+# --- material for a different capstone, not this project ---
+Datasets/CEP_dataset/

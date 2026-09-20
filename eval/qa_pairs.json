@@ -1,0 +1,50 @@
+[
+  {
+    "query": "What is the total revenue in the dataset and how many orders does it cover?",
+    "answer": "Total revenue is 1,383,220.00 across 2,500 orders."
+  },
+  {
+    "query": "Which product generates the most revenue, and how much?",
+    "answer": "Widget A is the top product with 375,235.00 in revenue (27.13% of the total)."
+  },
+  {
+    "query": "Which product performs worst by revenue?",
+    "answer": "Widget D is the weakest product with 326,854.00 in revenue."
+  },
+  {
+    "query": "Which region has the highest sales?",
+    "answer": "The West region leads with 361,383.00 in revenue (26.13% of the total)."
+  },
+  {
+    "query": "What is the average and median order value?",
+    "answer": "The average order value is 553.29 and the median order value is 552.50."
+  },
+  {
+    "query": "What is the standard deviation of sales?",
+    "answer": "The standard deviation of sales is 260.10."
+  },
+  {
+    "query": "Which month had the highest total sales?",
+    "answer": "2028-04 was the strongest month with 20,387.00 in sales."
+  },
+  {
+    "query": "Is the monthly sales trend going up or down?",
+    "answer": "The monthly trend is downward, with a slope of -5.09 sales per month across 83 months."
+  },
+  {
+    "query": "How do male and female customers compare in total revenue?",
+    "answer": "Female: 702,051.00 in revenue from 1,256 orders. Male: 681,169.00 in revenue from 1,244 orders."
+  },
+  {
+    "query": "Which customer age group spends the most in total?",
+    "answer": "The 35-44 age group spends the most, with 281,250.00 in total revenue across 521 orders."
+  },
+  {
+    "query": "What is the average customer satisfaction score?",
+    "answer": "Average customer satisfaction is 3.03 out of 5."
+  },
+  {
+    "query": "Is customer satisfaction correlated with sales?",
+    "answer": "The correlation between sales and customer satisfaction is 0.04, which is effectively no linear relationship."
+  }
+]
