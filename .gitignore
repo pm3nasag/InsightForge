@@ -9,6 +9,10 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 
+# --- raw screen captures: browser chrome exposes personal bookmarks, and the
+#     repository is public. Cropped versions are embedded in the report. ---
+Screenshot*.png
+
 # --- generated artefacts (rebuilt by run_pipeline.py) ---
 outputs/
 *.log

@@ -40,7 +40,9 @@ The app opens on <http://localhost:8501>.
 
 ## Deploying to Streamlit Community Cloud
 
-The app is live-deployable as-is. In the **Deploy an app** form use exactly:
+**Live app:** <https://insightforge-uuna235appup5czvxwocjtr.streamlit.app>
+
+In the **Deploy an app** form use exactly:
 
 | Field | Value |
 |---|---|
@@ -193,6 +195,7 @@ Capstone Project/
 ├── run_pipeline.py            end-to-end CLI runner
 ├── requirements.txt
 ├── .env.example
+├── InsightForge_Capstone_Report.docx   the project report
 ├── insightforge/
 │   ├── config.py              paths, provider resolution, tunables
 │   ├── data_loader.py         load + enrich
