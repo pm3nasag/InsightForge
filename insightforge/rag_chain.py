@@ -92,10 +92,11 @@ class InsightForgeAssistant:
         provider: str | None = None,
         k: int | None = None,
         enable_logging: bool = True,
+        api_key: str | None = None,
     ) -> None:
         self.kb = knowledge_base
         if llm is None:
-            self.llm, self.provider = get_llm(provider)
+            self.llm, self.provider = get_llm(provider, api_key=api_key)
         else:
             self.llm, self.provider = llm, provider or "custom"
 
@@ -261,7 +262,9 @@ class InsightForgeAssistant:
 # Convenience builder
 # ---------------------------------------------------------------------------
 def build_assistant(
-    include_pdfs: bool = True, provider: str | None = None
+    include_pdfs: bool = True,
+    provider: str | None = None,
+    api_key: str | None = None,
 ) -> InsightForgeAssistant:
     """Load data -> build knowledge base -> index -> return a ready assistant."""
     from insightforge.data_loader import load_sales_data
@@ -269,4 +272,4 @@ def build_assistant(
 
     kb = KnowledgeBase(load_sales_data(), include_pdfs=include_pdfs)
     kb.build_vector_store()
-    return InsightForgeAssistant(kb, provider=provider)
+    return InsightForgeAssistant(kb, provider=provider, api_key=api_key)

@@ -48,12 +48,23 @@ The app is live-deployable as-is. In the **Deploy an app** form use exactly:
 | Branch | `master` |
 | Main file path | `streamlit_app.py` |
 
-Then open **Advanced settings → Secrets** and paste:
+A key can be supplied two ways, and either is enough:
 
-```toml
-OPENROUTER_API_KEY = "sk-or-v1-..."
-CHAT_MODEL = "openai/gpt-4o-mini"
-```
+* **In the app** — the sidebar has an *OpenRouter API key* box. Whatever is
+  typed there applies to that browser session only: it is passed straight to
+  that session's LLM client, never stored on the shared settings object (one
+  Streamlit process serves every visitor, so a stored key would leak between
+  them), never logged, never written to disk. This is the way to let someone
+  try the deployed app on their own quota.
+* **In the deployment** — **Advanced settings → Secrets**:
+
+  ```toml
+  OPENROUTER_API_KEY = "sk-or-v1-..."
+  CHAT_MODEL = "openai/gpt-4o-mini"
+  ```
+
+A key typed in the sidebar wins; clearing the box falls back to the configured
+one; with neither, the app runs in offline extractive mode.
 
 There is no `.env` file on Streamlit Cloud, so
 [`config.py`](insightforge/config.py) reads each setting from the environment

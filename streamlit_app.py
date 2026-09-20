@@ -19,6 +19,7 @@ not run while the user is chatting.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -66,11 +67,20 @@ def _build_kb(path: str, include_pdfs: bool) -> KnowledgeBase:
     return kb
 
 
-def _get_assistant(kb: KnowledgeBase, provider: str, k: int) -> InsightForgeAssistant:
-    """One assistant per (provider, k, knowledge base) so memory survives reruns."""
-    signature = (provider, k, id(kb))
+def _get_assistant(
+    kb: KnowledgeBase, provider: str, k: int, api_key: str | None
+) -> InsightForgeAssistant:
+    """One assistant per (provider, k, key, knowledge base), so memory survives
+    reruns but a newly pasted API key really does build a new client.
+
+    The signature stores a fingerprint rather than the key itself.
+    """
+    fingerprint = hashlib.sha256((api_key or "").encode()).hexdigest()[:16]
+    signature = (provider, k, fingerprint, id(kb))
     if st.session_state.get("assistant_signature") != signature:
-        st.session_state.assistant = InsightForgeAssistant(kb, provider=provider, k=k)
+        st.session_state.assistant = InsightForgeAssistant(
+            kb, provider=provider, k=k, api_key=api_key
+        )
         st.session_state.assistant_signature = signature
     return st.session_state.assistant
 
@@ -96,6 +106,27 @@ st.session_state.setdefault("evaluation", None)
 st.sidebar.title("InsightForge")
 st.sidebar.caption("AI-powered business intelligence assistant")
 
+# --- API key ----------------------------------------------------------------
+# A visitor can paste their own key instead of relying on the deployment's
+# secrets. The value stays in this session's widget state and is passed down
+# to the LLM client per session - it is never written onto the shared
+# `settings` singleton, because one process serves every visitor and a stored
+# key would leak from one to the next.
+api_key = st.sidebar.text_input(
+    "OpenRouter API key",
+    type="password",
+    placeholder="sk-or-v1-...",
+    help=(
+        "Optional. Overrides the deployment's own key for this session only - "
+        "it is never logged or written to disk. Get one at openrouter.ai/keys. "
+        "Leave empty to use the configured key, or none at all to run in "
+        "offline mode."
+    ),
+)
+session_key = api_key.strip() or None
+if api_key and not api_key.strip().startswith("sk-or-"):
+    st.sidebar.warning("OpenRouter keys normally start with `sk-or-`.")
+
 data_path = st.sidebar.text_input("Dataset", value=str(settings.data_file))
 include_pdfs = st.sidebar.checkbox(
     "Index the reference PDFs",
@@ -109,15 +140,20 @@ provider = st.sidebar.selectbox(
 )
 top_k = st.sidebar.slider("Documents retrieved (k)", 3, 12, settings.top_k)
 
-resolved = settings.resolve_provider() if provider == "auto" else provider
+resolved = (
+    settings.resolve_provider(openrouter_key=session_key)
+    if provider == "auto"
+    else provider
+)
 if resolved == "offline":
     st.sidebar.warning(
-        "No API key found. Running in **offline extractive mode**: retrieval, "
-        "charts, memory and evaluation all work, but answers are extracted from "
-        "the statistics rather than written. Set `OPENROUTER_API_KEY` for full answers."
+        "No API key. Running in **offline extractive mode**: retrieval, charts, "
+        "memory and evaluation all work, but answers are extracted from the "
+        "statistics rather than written. Paste a key above for full answers."
     )
 else:
-    st.sidebar.success(f"Provider: **{resolved}** · `{settings.chat_model}`")
+    source = "your key" if session_key else "the configured key"
+    st.sidebar.success(f"Provider: **{resolved}** · `{settings.chat_model}` · using {source}")
 
 if not Path(data_path).exists():
     st.error(f"Dataset not found at `{data_path}`.")
@@ -126,7 +162,7 @@ if not Path(data_path).exists():
 df = _load_data(data_path)
 kb = _build_kb(data_path, include_pdfs)
 analyzer = DataAnalyzer(df)
-assistant = _get_assistant(kb, provider, top_k)
+assistant = _get_assistant(kb, provider, top_k, session_key)
 
 st.sidebar.divider()
 st.sidebar.metric("Transactions", f"{len(df):,}")

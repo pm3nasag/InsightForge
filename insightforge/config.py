@@ -104,18 +104,23 @@ class Settings:
             directory.mkdir(parents=True, exist_ok=True)
 
     # --- helpers -----------------------------------------------------------
-    def resolve_provider(self) -> str:
+    def resolve_provider(self, openrouter_key: str | None = None) -> str:
         """Return the provider actually usable on this machine.
 
         ``auto`` prefers OpenRouter (the provider configured for this
         project), then a direct OpenAI key, then Google, and finally falls
         back to the offline deterministic model so that the whole pipeline
         (and the Streamlit demo) still runs without any API key.
+
+        ``openrouter_key`` is a per-request override - the Streamlit sidebar
+        passes the key a visitor typed.  It is never stored on the singleton,
+        because one process serves every session and a stored key would leak
+        across them.
         """
         provider = (self.llm_provider or "auto").lower()
         if provider != "auto":
             return provider
-        if self.openrouter_api_key:
+        if openrouter_key or self.openrouter_api_key:
             return "openrouter"
         if self.openai_api_key:
             return "openai"

@@ -119,13 +119,20 @@ def get_llm(
     provider: str | None = None,
     temperature: float | None = None,
     model: str | None = None,
+    api_key: str | None = None,
 ) -> tuple[BaseChatModel, str]:
-    """Return ``(llm, description)`` for the requested / resolved provider."""
+    """Return ``(llm, description)`` for the requested / resolved provider.
+
+    ``api_key`` overrides the configured OpenRouter key for this client only.
+    The Streamlit sidebar uses it so a visitor can supply their own key without
+    touching the shared ``settings`` singleton, which every session reads.
+    """
+    api_key = (api_key or "").strip() or None
     provider = (provider or "auto").lower()
     if provider == "auto":
         # "auto" is a request to resolve, not a provider name - without this the
         # call would fall through every branch and land in offline mode.
-        provider = settings.resolve_provider()
+        provider = settings.resolve_provider(openrouter_key=api_key)
     temperature = settings.temperature if temperature is None else temperature
 
     if provider == "openrouter":
@@ -137,7 +144,7 @@ def get_llm(
                 model=model,
                 temperature=temperature,
                 max_tokens=settings.max_tokens,
-                api_key=settings.openrouter_api_key,
+                api_key=api_key or settings.openrouter_api_key,
                 base_url=settings.openrouter_base_url,
                 default_headers={
                     # optional OpenRouter attribution headers
