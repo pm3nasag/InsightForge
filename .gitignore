@@ -1,6 +1,7 @@
-# --- environment ---
+# --- environment and secrets (never commit these: the repo is public) ---
 venv/
 .env
+.streamlit/secrets.toml
 
 # --- python ---
 __pycache__/
@@ -10,6 +11,7 @@ __pycache__/
 
 # --- generated artefacts (rebuilt by run_pipeline.py) ---
 outputs/
+*.log
 
 # --- course download bundles (redundant with the extracted folders) ---
 *.zip

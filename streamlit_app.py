@@ -2,7 +2,7 @@
 
 Run with::
 
-    streamlit run app.py
+    streamlit run streamlit_app.py
 
 Tabs:
   Chat        - conversational RAG assistant with memory

@@ -11,7 +11,8 @@ The package is organised along the seven steps of the problem statement::
     5. RAG system setup .............. rag_chain.py
     6. Memory integration ............ rag_chain.py (ConversationBufferMemory)
     7. LLMOps ........................ evaluation.py, monitoring.py,
-                                       visualization.py, ../app.py
+                                       visualization.py,
+                                       ../streamlit_app.py
 """
 
 from insightforge.config import settings

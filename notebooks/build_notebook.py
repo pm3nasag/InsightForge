@@ -373,11 +373,12 @@ pd.DataFrame(load_interactions()).tail(8)[["timestamp", "question", "provider", 
 ---
 ## Step 7d · Streamlit UI
 
-The interface lives in `app.py` at the project root. From a terminal in the
+The interface lives in `streamlit_app.py` at the project root (Streamlit
+Community Cloud looks for that name by default). From a terminal in the
 project folder:
 
 ```bash
-streamlit run app.py
+streamlit run streamlit_app.py
 ```
 
 It exposes seven tabs — Chat, Dashboard, Insights, Evaluation, Monitoring and
@@ -395,7 +396,7 @@ Knowledge base — over exactly the objects built in this notebook.
 | 4 Chain prompts | `prompts.py`, `rag_chain.full_report()` |
 | 5 RAG system | `rag_chain.py` (LCEL over the custom retriever) |
 | 6 Memory | `rag_chain.WindowedMemory` + question condensation |
-| 7 LLMOps | `evaluation.py`, `visualization.py`, `monitoring.py`, `app.py` |
+| 7 LLMOps | `evaluation.py`, `visualization.py`, `monitoring.py`, `streamlit_app.py` |
 """
     ),
 ]

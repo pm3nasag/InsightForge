@@ -28,6 +28,29 @@ def _as_bool(value: str | None, default: bool = False) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _secret(name: str, default: str | None = None) -> str | None:
+    """Read a setting from the environment, then from Streamlit secrets.
+
+    Locally the value comes from the shell or a ``.env`` file.  On Streamlit
+    Community Cloud there is no ``.env``: values are pasted into the app's
+    Secrets box and surface through ``st.secrets``.  Reading both means the
+    same code deploys unchanged.
+
+    Every access is guarded: ``st.secrets`` raises when no secrets file
+    exists, and Streamlit is not installed at all for a pure-CLI run.
+    """
+    value = os.getenv(name)
+    if value:
+        return value
+    try:
+        import streamlit as st
+
+        value = st.secrets.get(name)  # type: ignore[union-attr]
+    except Exception:
+        return default
+    return value or default
+
+
 @dataclass
 class Settings:
     """Runtime settings, overridable through environment variables."""
@@ -44,25 +67,25 @@ class Settings:
 
     # --- LLM ---------------------------------------------------------------
     # provider: "openrouter" | "openai" | "google" | "offline" | "auto"
-    llm_provider: str = field(default_factory=lambda: os.getenv("LLM_PROVIDER", "auto"))
+    llm_provider: str = field(default_factory=lambda: _secret("LLM_PROVIDER", "auto"))
     openrouter_api_key: str | None = field(
-        default_factory=lambda: os.getenv("OPENROUTER_API_KEY")
+        default_factory=lambda: _secret("OPENROUTER_API_KEY")
     )
     openrouter_base_url: str = field(
-        default_factory=lambda: os.getenv(
+        default_factory=lambda: _secret(
             "OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"
         )
     )
-    openai_api_key: str | None = field(default_factory=lambda: os.getenv("OPENAI_API_KEY"))
-    google_api_key: str | None = field(default_factory=lambda: os.getenv("GOOGLE_API_KEY"))
+    openai_api_key: str | None = field(default_factory=lambda: _secret("OPENAI_API_KEY"))
+    google_api_key: str | None = field(default_factory=lambda: _secret("GOOGLE_API_KEY"))
     chat_model: str = field(
-        default_factory=lambda: os.getenv("CHAT_MODEL", "openai/gpt-4o-mini")
+        default_factory=lambda: _secret("CHAT_MODEL", "openai/gpt-4o-mini")
     )
     embedding_model: str = field(
-        default_factory=lambda: os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+        default_factory=lambda: _secret("EMBEDDING_MODEL", "text-embedding-3-small")
     )
-    temperature: float = field(default_factory=lambda: float(os.getenv("TEMPERATURE", "0.1")))
-    max_tokens: int = field(default_factory=lambda: int(os.getenv("MAX_TOKENS", "900")))
+    temperature: float = field(default_factory=lambda: float(_secret("TEMPERATURE", "0.1")))
+    max_tokens: int = field(default_factory=lambda: int(_secret("MAX_TOKENS", "900")))
 
     # --- RAG ---------------------------------------------------------------
     chunk_size: int = 900

@@ -26,7 +26,7 @@ copy .env.example .env           # then paste your OPENROUTER_API_KEY
 python run_pipeline.py
 
 # 4. launch the app
-streamlit run app.py
+streamlit run streamlit_app.py
 ```
 
 The app opens on <http://localhost:8501>.
@@ -35,6 +35,39 @@ The app opens on <http://localhost:8501>.
 > extractive mode* — retrieval, memory, charts, evaluation and the UI all work,
 > answers are pulled verbatim from the computed statistics instead of being
 > written by an LLM.
+
+---
+
+## Deploying to Streamlit Community Cloud
+
+The app is live-deployable as-is. In the **Deploy an app** form use exactly:
+
+| Field | Value |
+|---|---|
+| Repository | `pm3nasag/InsightForge` |
+| Branch | `master` |
+| Main file path | `streamlit_app.py` |
+
+Then open **Advanced settings → Secrets** and paste:
+
+```toml
+OPENROUTER_API_KEY = "sk-or-v1-..."
+CHAT_MODEL = "openai/gpt-4o-mini"
+```
+
+There is no `.env` file on Streamlit Cloud, so
+[`config.py`](insightforge/config.py) reads each setting from the environment
+first and then from `st.secrets`, which means the same code runs locally and
+deployed with no branching. Leave the secrets empty and the app still boots —
+it just falls back to offline extractive mode.
+
+Two gotchas worth knowing:
+
+* The entry point **must** be called `streamlit_app.py` unless you override the
+  main file path; that is the name Streamlit Cloud looks for by default.
+* A private repository shows up in the deploy form as *"This repository does
+  not exist"*. Either make it public or grant Streamlit access to private repos
+  under **Settings → Linked accounts → GitHub**.
 
 ---
 
@@ -52,7 +85,7 @@ The app opens on <http://localhost:8501>.
 | 6 | Memory integration | `WindowedMemory` + question condensation in [`rag_chain.py`](insightforge/rag_chain.py) |
 | 7 | Model evaluation (QAEvalChain) | [`insightforge/evaluation.py`](insightforge/evaluation.py) |
 | 7 | Data visualisation | [`insightforge/visualization.py`](insightforge/visualization.py) — nine charts across the four required families |
-| 7 | Streamlit UI | [`app.py`](app.py) |
+| 7 | Streamlit UI | [`streamlit_app.py`](streamlit_app.py) |
 | 7 | Monitoring | [`insightforge/monitoring.py`](insightforge/monitoring.py) — JSONL log of latency, tokens, provider, errors |
 
 ---
@@ -145,7 +178,7 @@ python -m pytest tests -q
 
 ```
 Capstone Project/
-├── app.py                     Streamlit UI (6 tabs)
+├── streamlit_app.py           Streamlit UI (6 tabs) - the deploy entry point
 ├── run_pipeline.py            end-to-end CLI runner
 ├── requirements.txt
 ├── .env.example

@@ -132,7 +132,7 @@ def main(argv: list[str] | None = None) -> int:
     banner("Monitoring summary")
     print(json.dumps(usage_report(), indent=2))
     print(f"\nPipeline finished in {time.perf_counter() - started:.1f}s")
-    print("Next step: `streamlit run app.py`")
+    print("Next step: `streamlit run streamlit_app.py`")
     return 0
 
 
